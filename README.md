@@ -14,7 +14,7 @@ The datasets used in this project are available at the site where the data was o
 
 http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
 
-### Dataset file:
+### Dataset files:
 
 https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
 
