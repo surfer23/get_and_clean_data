@@ -68,6 +68,8 @@ train_data <- assign_col_names("train")
 
 merged_dataset <- rbind(test_data,train_data)
 fwrite(merged_dataset, "merged_tidy_data.csv")
+write.table(data,"merged_tidy_data.txt",row.names=FALSE)
 
 #Outputs the mean values for each variable for each activity carried out by each Subject and outputs the result to a file called mean_tidy_data.csv
 fwrite(merged_dataset %>% group_by(.dots=c("Subject","Activity")) %>% summarise_each(funs(mean)), "mean_tidy_data.csv")
+write.table(merged_dataset %>% group_by(.dots=c("Subject","Activity")) %>% summarise_each(funs(mean)),"mean_tidy_data.txt",row.names=FALSE)
