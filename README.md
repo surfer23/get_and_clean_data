@@ -31,6 +31,7 @@ https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Datas
 ##### 1. Adding variable headers to each column using the features.txt file
 
 ```
+#Restructure coulmn names to make them more readable then assign them to the dataset in question
 assign_col_names <- function(group){
 
   #Restructure the coulmn names
@@ -38,6 +39,8 @@ assign_col_names <- function(group){
   columnNames = features$V2
   columnNames <- str_replace_all(columnNames, "-", "_")
   columnNames <- gsub("[][!#$%()*,.:;<=>@^`|~.{}]", "", columnNames)
+  
+  
   
   #Assign the restructered headers to the dataset
   ds = read.table(paste0(dir,"//",group,"//x_",group,".txt"), header=FALSE)
@@ -55,27 +58,30 @@ add_sub_act <- function(group,ds){
   #Add activity column
   act_desc <- read.table(paste0(dir,"//activity_labels.txt"), header = FALSE, sep = "")
   act_column <- read.table(paste0(dir,"//",group,"//y_",group,".txt"), header = FALSE, sep = "")
-  print(str(act_column))
-  merge_column <- merge(act_desc, act_column, all.x=TRUE)
-  print(str(merge_column))
-  ds <- cbind("Activity" = merge_column$V2, ds)
+  act_joined <- full_join(x = act_column, y = act_desc, by = "V1")
+  ds <- cbind("Activity" = act_joined$V2, ds)
   
   #Add subject column
   sub_column <- read.table(paste0(dir,"//",group,"//subject_",group,".txt"), header = FALSE, sep = "")
   ds <- cbind("Subject" = sub_column$V1, ds)
   ds <- ds[!duplicated(as.list(ds))]
-  ds_final <- select(ds,  one_of ("Subject", "Activity"), matches("mean|std"))  
+  ds_final <- select(ds,  one_of ("Subject", "Activity"), matches("mean|std"))
   ds_final
+  
 }
 
 ```
 
 ##### 3. Merging the two datasets and outputing the first tidy dataset merged_tidy_data.csv
 ```
-#Merges the training and the test sets to create one data set and outputs it as a file called merged_tidy_data.csv.
+#Merges the training and the test sets to create one data set and outputs it as a file called merged_tidy_data.csv & .txt.
 
 merged_dataset <- rbind(test_data,train_data)
+merged_dataset$Activity <- as.factor(merged_dataset$Activity)
+merged_dataset$Subject <- as.factor(merged_dataset$Subject)
+
 fwrite(merged_dataset, "merged_tidy_data.csv")
+write.table(data,"merged_tidy_data.txt",row.names=FALSE)
 
 ```
 
@@ -83,5 +89,6 @@ fwrite(merged_dataset, "merged_tidy_data.csv")
 ##### 4. Outputting the mean of each variable for the activities carried out by each participant 
 ```
 #Outputs the mean values for each variable for each activity carried out by each Subject and outputs the result to a file called mean_tidy_data.csv
-fwrite(merged_dataset %>% group_by(.dots=c("Subject","Activity")) %>% summarise_each(funs(mean)), "mean_tidy_data.csv")
+fwrite(merged_dataset %>% group_by(.dots=c("Subject","Activity")) %>% summarise_each(funs(mean)), "tidy_data.csv")
+write.table(merged_dataset %>% group_by(.dots=c("Subject","Activity")) %>% summarise_each(funs(mean)),"tidy_data.txt",row.names=FALSE)
 ```
